@@ -1,6 +1,21 @@
 @EnviosApi_HostAddress = http://localhost:5006
 
-GET {{EnviosApi_HostAddress}}/weatherforecast/
+### Listar envíos
+GET {{EnviosApi_HostAddress}}/api/envios
 Accept: application/json
 
-###
+### Crear un envío
+POST {{EnviosApi_HostAddress}}/api/envios
+Content-Type: application/json
+
+{
+  "direccion": "Av. Colón 1234",
+  "clienteId": 1
+}
+
+### Obtener un envío por id
+GET {{EnviosApi_HostAddress}}/api/envios/2
+Accept: application/json
+
+### Eliminar un envío
+DELETE {{EnviosApi_HostAddress}}/api/envios/2

@@ -22,5 +22,9 @@ public class AppDbContext : DbContext
             .HasOne(e => e.Cliente)
             .WithMany(c => c.Envios)
             .HasForeignKey(e => e.ClienteId);
+        modelBuilder.Entity<Cliente>().Property(c => c.Nombre).HasMaxLength(100);
+        modelBuilder.Entity<Cliente>().Property(c => c.Email).HasMaxLength(150);
+        modelBuilder.Entity<Envio>().Property(e => e.Direccion).HasMaxLength(200);   
+
     }
 }

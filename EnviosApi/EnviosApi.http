@@ -19,3 +19,9 @@ Accept: application/json
 
 ### Eliminar un envío
 DELETE {{EnviosApi_HostAddress}}/api/envios/2
+
+### Cambio de estado
+PATCH http://localhost:5006/api/envios/3/estado
+Content-Type: application/json
+
+{ "estado": "EnTransito" }

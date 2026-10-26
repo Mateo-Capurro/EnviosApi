@@ -60,7 +60,9 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-
+// Solo en Docker (Database__MigrateOnStartup=true): con SQL Express local las migraciones se aplican a mano.
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+    await MigrarConReintentosAsync(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -79,3 +81,26 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+static async Task MigrarConReintentosAsync(WebApplication app)
+{
+    const int maxIntentos = 10;
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
+    for (var intento = 1; ; intento++)
+    {
+        try
+        {
+            using var scope = app.Services.CreateScope();
+            var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await db.Database.MigrateAsync();
+            logger.LogInformation("Migraciones aplicadas.");
+            return;
+        }
+        catch (Exception ex) when (intento < maxIntentos)
+        {
+            logger.LogWarning("La base no responde (intento {Intento}/{Max}): {Error}", intento, maxIntentos, ex.Message);
+            await Task.Delay(TimeSpan.FromSeconds(5));
+        }
+    }
+}

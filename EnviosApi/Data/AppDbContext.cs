@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Cliente> Clientes => Set<Cliente>();
     public DbSet<Envio> Envios => Set<Envio>();
+    public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -24,7 +25,13 @@ public class AppDbContext : DbContext
             .HasForeignKey(e => e.ClienteId);
         modelBuilder.Entity<Cliente>().Property(c => c.Nombre).HasMaxLength(100);
         modelBuilder.Entity<Cliente>().Property(c => c.Email).HasMaxLength(150);
-        modelBuilder.Entity<Envio>().Property(e => e.Direccion).HasMaxLength(200);   
+        modelBuilder.Entity<Envio>().Property(e => e.Direccion).HasMaxLength(200);
+
+        modelBuilder.Entity<Usuario>()
+            .HasIndex(u => u.Email).IsUnique();
+        modelBuilder.Entity<Usuario>().Property(u => u.Email).HasMaxLength(150);
+        modelBuilder.Entity<Usuario>().Property(u => u.PasswordHash).HasMaxLength(100);
+        modelBuilder.Entity<Usuario>().Property(u => u.Rol).HasMaxLength(20);
 
     }
 }

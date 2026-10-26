@@ -1,12 +1,37 @@
 @EnviosApi_HostAddress = http://localhost:5006
 
+### Registrar usuario (el primero queda como Admin)
+POST {{EnviosApi_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@envios.com",
+  "password": "Password123"
+}
+
+### Login (guarda el token en {{login.response.body.token}})
+# @name login
+POST {{EnviosApi_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@envios.com",
+  "password": "Password123"
+}
+
+### Listar envíos sin token (401)
+GET {{EnviosApi_HostAddress}}/api/envios
+Accept: application/json
+
 ### Listar envíos
 GET {{EnviosApi_HostAddress}}/api/envios
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 ### Crear un envío
 POST {{EnviosApi_HostAddress}}/api/envios
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "direccion": "Av. Colón 1234",
@@ -16,12 +41,20 @@ Content-Type: application/json
 ### Obtener un envío por id
 GET {{EnviosApi_HostAddress}}/api/envios/2
 Accept: application/json
+Authorization: Bearer {{login.response.body.token}}
 
-### Eliminar un envío
+### Eliminar un envío (solo Admin)
 DELETE {{EnviosApi_HostAddress}}/api/envios/2
+Authorization: Bearer {{login.response.body.token}}
 
 ### Cambio de estado
-PATCH http://localhost:5006/api/envios/3/estado
+PATCH {{EnviosApi_HostAddress}}/api/envios/3/estado
 Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
 
 { "estado": "EnTransito" }
+
+### Listar clientes
+GET {{EnviosApi_HostAddress}}/api/clientes
+Accept: application/json
+Authorization: Bearer {{login.response.body.token}}

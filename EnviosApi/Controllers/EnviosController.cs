@@ -1,10 +1,12 @@
 using EnviosApi.DTOs;
 using EnviosApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EnviosApi.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/[controller]")]
 public class EnviosController : ControllerBase
 {
@@ -32,6 +34,7 @@ public class EnviosController : ControllerBase
         Ok(await _service.CambiarEstadoAsync(id, dto.Estado));
 
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         await _service.DeleteAsync(id);

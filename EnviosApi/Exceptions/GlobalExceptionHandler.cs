@@ -17,6 +17,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             NotFoundException => (StatusCodes.Status404NotFound, "Recurso no encontrado"),
             BusinessRuleException => (StatusCodes.Status400BadRequest, "Regla de negocio incumplida"),
             ConflictException => (StatusCodes.Status409Conflict, "Conflicto con el estado actual"),
+            UnauthorizedException => (StatusCodes.Status401Unauthorized, "No autorizado"),
             _ => (StatusCodes.Status500InternalServerError, "Error interno del servidor")
         };
 

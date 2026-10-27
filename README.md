@@ -40,8 +40,12 @@ Controllers  ->  Services  ->  Repositories  ->  AppDbContext (EF Core)  ->  SQL
 
 ```
 EnviosApi/
+├── EnviosApi.sln          # Solución con la API y los tests
 ├── docker-compose.yml
 ├── .env.example
+├── EnviosApi.Tests/       # Tests unitarios (xUnit + Moq)
+│   ├── Services/          # EnvioService, ClienteService, AuthService, TokenService
+│   └── DTOs/              # Validación de ClienteCreateDto
 └── EnviosApi/
     ├── Controllers/       # AuthController, ClientesController, EnviosController
     ├── Services/          # Lógica de negocio + TokenService (JWT)
@@ -219,6 +223,24 @@ Pasos (desde la carpeta `EnviosApi/` del proyecto):
 
 También podés usar el archivo [`EnviosApi/EnviosApi.http`](EnviosApi/EnviosApi.http) desde Visual Studio, Rider o VS Code (extensión REST Client): el request de login guarda el token y los siguientes lo reutilizan.
 
+## Tests
+
+El proyecto `EnviosApi.Tests` (xUnit) tiene **49 tests unitarios**. Para correrlos, desde la raíz del repositorio:
+
+```bash
+dotnet test
+```
+
+No necesitan base de datos ni Docker: los services se prueban con los repositorios mockeados con **Moq**, así cada test controla qué devuelve el acceso a datos y verifica solo la lógica de negocio.
+
+Qué cubren:
+
+- **Transiciones de estado** (`EnvioService`): transiciones válidas, transiciones inválidas como `Pendiente` → `Entregado` (`BusinessRuleException`), estados finales y envío o cliente inexistente (`NotFoundException`).
+- **Reglas de clientes** (`ClienteService`): DNI duplicado al crear o actualizar y cliente con envíos que no se puede eliminar (`ConflictException`), cliente inexistente (`NotFoundException`).
+- **Registro y login** (`AuthService`): el primer usuario queda `Admin` y los siguientes `Operador`, email duplicado, email normalizado, contraseña guardada como hash BCrypt, login correcto y mismo mensaje para email inexistente y contraseña incorrecta (`UnauthorizedException`).
+- **Generación del JWT** (`TokenService`): claims `sub`, `email` y rol, y vencimiento según `Jwt:ExpireMinutes` (configuración en memoria).
+- **Validación del DNI** (`ClienteCreateDto`): 7 u 8 dígitos según el `[RegularExpression]` del DTO.
+
 ## Capturas
 
 ### Swagger UI y autenticación
@@ -237,7 +259,6 @@ CRUD de clientes y operaciones sobre envíos, incluido el cambio de estado con `
 
 Mejoras planificadas que **todavía no están implementadas**:
 
-- [ ] Tests unitarios con xUnit para los servicios (reglas de negocio y autenticación).
 - [ ] Paginación en los listados de clientes y envíos.
 - [ ] Refresh tokens para renovar la sesión sin volver a iniciar sesión.
 
